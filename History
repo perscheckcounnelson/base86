@@ -1,0 +1,37 @@
+// src/components/TransactionHistory.js
+import React, { useEffect, useState } from 'react';
+
+const TransactionHistory = ({ contract, account }) => {
+  const [transactions, setTransactions] = useState([]);
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      const pastEvents = await contract.getPastEvents('Transfer', {
+        filter: { from: account },
+        fromBlock: 0,
+        toBlock: 'latest',
+      });
+
+      setTransactions(pastEvents);
+    };
+
+    fetchTransactions();
+  }, [contract, account]);
+
+  return (
+    <div>
+      <h2>Transaction History</h2>
+      <ul>
+        {transactions.map((tx, index) => (
+          <li key={index}>
+            <strong>To:</strong> {tx.returnValues.to} | 
+            <strong>Amount:</strong> {tx.returnValues.value} | 
+            <strong>Block:</strong> {tx.blockNumber}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default TransactionHistory;
